@@ -1,0 +1,210 @@
+<?php
+include ('action/koneksi.php');
+  
+  if(isset($_GET['id'])) {
+   
+   $id=base64_decode($_GET['id']); 
+    //baris dibawah ini disesuaikan dengan nama tabel dan idtabelnya
+ 
+
+   $sql=mysqli_query($conn,"SELECT * FROM tbl_toko where id_toko = '$id'  ");
+
+    $data = mysqli_fetch_object($sql);
+    $Lat = $data->Lat;
+    $Lng = $data->Lng;
+  }
+?>
+<style type="text/css">
+      #map { height: 400px; }
+    </style>
+
+
+<style>
+
+      .controls {
+        margin-top: 10px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 300px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      .pac-container {
+        font-family: Roboto;
+      }
+
+      #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #type-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+    </style>            
+<script type="text/javascript">
+var map;
+        var marker;
+
+        function initMap() {                           
+            var latitude = <?php echo $Lat; ?> //-5.4747495; // YOUR LATITUDE VALUE
+            var longitude = <?php echo $Lng; ?>//104.1441486; // YOUR LONGITUDE VALUE
+            
+            var myLatLng = {lat: latitude, lng: longitude};
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+              center: myLatLng,
+              zoom: 10,
+              disableDoubleClickZoom: true, // disable the default map zoom on double click
+            });
+            
+            // Update lat/long value of div when anywhere in the map is clicked    
+            
+            
+            // Update lat/long value of div when you move the mouse over the map
+       
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'Maps Info',
+                icon:'../marker.png'
+            });        
+            //var marker = new google.maps.Marker({
+              //position: myLatLng,
+              //map: map,
+              //title: 'Hello World'
+              
+              // setting latitude & longitude as title of the marker
+              // title is shown when you hover over the marker
+              //title: latitude + ', ' + longitude 
+           // });    
+            
+            // Update lat/long value of div when the marker is clicked
+            
+            
+            // Create new marker on double click event on the map
+            
+            google.maps.event.addListener(map,'dblclick',function(event) {
+             
+                if (marker && marker.setMap) {
+                  marker.setMap(null);
+                }
+                marker = new google.maps.Marker({
+                  position: event.latLng, 
+                  map: map, 
+                  title: event.latLng.lat()+', '+event.latLng.lng()
+                });
+                
+                // Update lat/long value of div when the marker is clicked
+                $("#lat").val(event.latLng.lat());
+                $("#long").val(event.latLng.lng());
+                          
+            });
+            
+            // Create new marker on single click event on the map
+            /*google.maps.event.addListener(map,'click',function(event) {
+                var marker = new google.maps.Marker({
+                  position: event.latLng, 
+                  map: map, 
+                  title: event.latLng.lat()+', '+event.latLng.lng()
+                });                
+            });*/
+        }
+
+    </script>
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCoilQqu_Iz-1B_zzqvbxJB3HC8ScFjZ8E&callback=initMap" async defer></script>
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+      
+        <!-- Main content -->
+        <section class="content">
+
+          <div class="row">
+             <div class="col-md-12">
+              <div class="box box-success">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Tambah Toko</h3>
+                </div>
+                <!-- /.box-header -->
+               
+                <div class="box-body">
+  <form class="form-horizontal" action="action/tempat_simpan.php" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                  <label>Lokasi Toko</label>
+                  <input id="pac-input" class="controls"  type="text" placeholder="Lokasi">
+                  <div id="map"></div>
+              </div>
+
+              <div class="form-group">
+                  <label>Nama Toko</label>
+                  <input name="nama_toko" type="text" value="<?php echo $data->nama_toko; ?>" id="nama_toko" class="form-control" placeholder="Nama Toko" required="">
+                 </div>
+
+              <div class="form-group">
+                  <label>Informasi Toko</label>
+                  <textarea name="informasi" ><?php echo $data->informasi; ?></textarea>
+                 </div>
+                    
+              <div class="form-group">
+                  <label>Latittude</label>
+                  <input name="lat" type="text"  id="lat" value="<?php echo $data->Lat; ?>" class="form-control" placeholder="Latittude" required="">
+                 </div>
+
+                <div class="form-group">
+                  <label>Longitude</label>
+                  <input name="long" type="text" id="long" value="<?php echo $data->Lng; ?>" class="form-control" placeholder="Longitute" required="">
+                </div>
+              
+                  
+                <div class="form-group">
+                  <label>No Telpon</label>
+                  <input name="no_telp" type="text" value="<?php echo $data->no_telpon; ?>" class="form-control" placeholder="No Telpon" required="">      
+                 </div>
+
+                  <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea name="alamat" rows="8" cols="80"><?php echo $data->alamat; ?></textarea>
+                  </div>
+    
+                  <div class="form-group">
+                  <label>Sosial Media</label>
+                  <textarea name="link" ><?php echo $data->Link; ?></textarea>
+                </div>
+                <!-- /.box-body -->
+
+                <div class="box-footer">
+                   <button type="submit" class="btn btn-primary btn-sm">Ubah</button>
+                <a href="" class="btn btn-warning btn-flat"><i class="fa fa-retweet"></i> Kembali</a>
+                </div>
+
+                </form>
+              </div>
+              <!-- /.box -->
+            </div>
+          </div>
+          <!-- /.row -->
+
+        </section>
+        <!-- /.content -->
+        </div>
